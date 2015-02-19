@@ -8,3 +8,5 @@ $ ./tokumx.sh build
 create mongod container
 
 $ ./tokumx.sh mongod tokumx.conf
+
+hello
