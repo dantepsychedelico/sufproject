@@ -19,7 +19,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             if not bool(self.data):
                 print("stop conn: {}".format(self.client_address[0]))
                 return
-            self.request.sendall(self.data.upper())
+            self.request.sendall(self.data.decode().encode('utf-8').upper())
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 9999
