@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import socketserver, json
+import socketserver, json, struct
 
 users = {}
 rooms = {}
@@ -14,13 +14,17 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         while True:
             # self.request is the TCP socket connected to the client
-            self.data = self.request.recv(1024).strip()
-            print("{} wrote:".format(self.client_address[0]))
-            print(self.data)
-            # just send back the same data, but upper-cased
-            if bool(self.data):
-                rjson = self.resolve(json.loads(self.data.decode().strip('\x00\x06')))
-                self.request.sendall(b'\x00\x06'+json.dumps(rjson).encode())
+            print("start conn {}".format(self.client_address[0]))
+            data = self.request.recv(2)
+            if bool(data):
+                buflen, = struct.unpack('!H', data)
+                data = self.request.recv(buflen)
+                clientip = self.client_address[0]
+                print("{} wrote: {}".format(clientip, data))
+                rjson = self.resolve(json.loads(data.decode()))
+                bjson = json.dumps(rjson).encode()
+                print("{} report: {}".format(clientip, struct.pack('!H', len(bjson))+bjson))
+                self.request.sendall(struct.pack('!H', len(bjson))+bjson)
             else:
                 print("stop conn: {}".format(self.client_address[0]))
                 return
