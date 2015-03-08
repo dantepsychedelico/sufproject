@@ -91,9 +91,9 @@ class Room:
 
 if __name__ == "__main__":
     from sys import argv
-    HOST, PORT = "localhost", int(argv[1])
+    HOST, PORT = argv[1], int(argv[2])
 
-    # used ./pySocketServer.py 9999
+    # used $python3 pySocketServer.py localhost 9999
     # Create the server, binding to localhost on port argv[1]
     server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
 
