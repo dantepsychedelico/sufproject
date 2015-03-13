@@ -61,10 +61,13 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 if ruid==uid:
                     continue
                 else:
-                    users[ruid].socket.request.sendall(b'\x00\x06'+json.dumps(fjson).encode())
+                    fjson["method"] = "chat"
+                    bjson = json.dumps(fjson).encode()
+                    users[ruid].socket.request.sendall(struct.pack('!H', len(bjson))+bjson)
             rjson = {"stauts": "ok"}
         else:
             assert False, "unknown method: {}".format(method)
+        rjson["method"] = method
         return rjson
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
