@@ -64,7 +64,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                     fjson["method"] = "chat"
                     bjson = json.dumps(fjson).encode()
                     users[ruid].socket.request.sendall(struct.pack('!H', len(bjson))+bjson)
-            rjson = {"stauts": "ok"}
+            rjson = {"stauts": "ok", "id": uid}
         else:
             assert False, "unknown method: {}".format(method)
         rjson["method"] = method
