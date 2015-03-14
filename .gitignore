@@ -2,3 +2,6 @@ tokumx/data/
 tokumx/log/
 tokumx/.dbshell
 *.swp
+mongo3/data
+mongo3/log
+mongo3/.dbshell
