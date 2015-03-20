@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import socketserver, json, struct
+import socketserver, json, struct, time
 
 users = {}
 rooms = {}
@@ -29,41 +29,48 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 print("stop conn: {}".format(self.client_address[0]))
                 return
 
-    def resolve(self, sjson):
-        method = sjson["method"]
+    def resolve(self, reqjson):
+        method = reqjson["method"]
         if method == "new":
             user = User()
             user.setSocket(self)
             users[user.id] = user
             rjson = {"status": "ok", "id": user.id}
         elif method == "online":
-            user = User(sjson["id"])
+            user = User(reqjson["id"])
             user.setSocket(self)
             users[user.id] = user
             rjson = {"status": "ok"}
         elif method == "newroom":
             room = Room()
-            room.addMember(sjson["id"])
-            rooms[room.id] = room
-            rjson = {"status": "ok", "room": room.id}
+            room.addMember(reqjson["id"])
+            rooms[room.roomId] = room   ## save room status
+            rjson = { "status": "ok", "roomid": room.roomId, 
+                    "roomname": reqjson["roomname"],
+                    "members": room.getMembers(),
+                    "createtime": int(time.time()),
+                    "alivetime": reqjson["alivetime"]}
             print(room.members)
         elif method == "join":
-            room = rooms[sjson["room"]]
-            room.addMember(sjson["id"])
-            rjson = {"status": "ok", "room": room.id}
+            room = rooms[reqjson["roomid"]]
+            room.addMember(reqjson["id"])
+            rjson = {"status": "ok", "roomid": room.roomId,
+                    "members": room.getMembers(), "alivetime": 1000,
+                    "createtime": 1426858964, "roomname": "room"}
             print(room.members)
         elif method == "chat":
-            uid = sjson["id"]
-            room = rooms[sjson["room"]]
-            fjson = {"status": "chat", "id": uid, "room": sjson["room"], 
-                    "text": sjson["text"]}
-            for ruid in room.members:
-                if ruid==uid:
+            uid = reqjson["id"]
+            room = rooms[reqjson["roomid"]]
+            fjson = {"status": "ok", "id": uid, "roomid": reqjson["roomid"], 
+                    "type": reqjson["type"], "content": reqjson["content"], 
+                    "time": int(time.time())}
+            for memberId in room.members:
+                if memberId==uid:
                     continue
                 else:
                     fjson["method"] = "chat"
                     bjson = json.dumps(fjson).encode()
-                    users[ruid].socket.request.sendall(struct.pack('!H', len(bjson))+bjson)
+                    users[memberId].socket.request.sendall(struct.pack('!H', len(bjson))+bjson)
             rjson = {"stauts": "ok", "id": uid}
         else:
             assert False, "unknown method: {}".format(method)
@@ -85,16 +92,20 @@ class User:
         self.socket = conn
 
 class Room:
-    id = 0
-    def __init__(self, rid=0):
+    maxRoomId = 0
+    def __init__(self, roomId=0):
         self.members = set()
-        if rid:
-            self = rooms[rid]
+        if roomId:
+            self = rooms[roomId]
         else:
-            self.__class__.id += 1
+            self.__class__.maxRoomId += 1
+            self.roomId = self.maxRoomId
 
     def addMember(self, uid):
         self.members.add(uid)
+
+    def getMembers(self):
+        return list(self.members)
 
 if __name__ == "__main__":
     from sys import argv
@@ -104,6 +115,7 @@ if __name__ == "__main__":
     # Create the server, binding to localhost on port argv[1]
     server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
 
+    ## chat {"method": "chat", "id": 1, "roomid": 10, type: "content", "content": "hello"}
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     server.serve_forever()
