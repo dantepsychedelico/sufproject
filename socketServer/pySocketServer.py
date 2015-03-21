@@ -12,15 +12,15 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     client.
     """
     def handle(self):
+        print("start conn {}".format(self.client_address[0]))
         while True:
             # self.request is the TCP socket connected to the client
-            print("start conn {}".format(self.client_address[0]))
-            data = self.request.recv(2)
-            if bool(data):
-                buflen, = struct.unpack('!H', data)
+            header = self.request.recv(2)
+            if bool(header):
+                buflen, = struct.unpack('!H', header)
                 data = self.request.recv(buflen)
                 clientip = self.client_address[0]
-                print("{} wrote: {}".format(clientip, data))
+                print("{} wrote: {}".format(clientip, header+data))
                 rjson = self.resolve(json.loads(data.decode()))
                 bjson = json.dumps(rjson).encode()
                 print("{} report: {}".format(clientip, struct.pack('!H', len(bjson))+bjson))
