@@ -9,7 +9,7 @@ PORT = 30000
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
-data = {"method": "new"}
+data = {"method": "testing"}
 bson = json.dumps(data).encode()
 print("start connect")
 print(struct.pack('!H', len(bson)))

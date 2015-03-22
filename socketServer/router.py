@@ -40,6 +40,9 @@ class router:
         Users.updateSocket(self.socket)
         return {"uid": self.uid}
 
+    def stopSocket(self):
+        Users.removeSocket(self.uid)
+
     def newRoom(self, data):
         return
 

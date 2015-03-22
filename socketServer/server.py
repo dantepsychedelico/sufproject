@@ -10,10 +10,8 @@ import sys, logging, traceback
 LOG_FILE = "python-socket-server.log"
 logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG, \
             format='%(asctime)s %(message)s')
+##
 
-
-users = {}
-rooms = {}
 class MyTCPHandler(socketserver.BaseRequestHandler):
     """
     The RequestHandler class for our server.
@@ -46,6 +44,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 traceback.print_exception(exc_type, exc_value, exc_traceback, file=fn)
             print (traceback.print_exc())
             self.request.close()
+            rt.stopSocket()
+            return
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass

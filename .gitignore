@@ -1,7 +1,8 @@
 tokumx/data/
 tokumx/log/
 tokumx/.dbshell
-__pycache__
+__pycache__/
+socketServer/__pycache__/
 *.swp
 mongo3/data
 mongo3/log

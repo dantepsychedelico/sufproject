@@ -18,3 +18,7 @@ class Users:
     @classmethod
     def updateSocket(cls, socketConnect):
         cls.onlineSockets[cls.currentUid] = socketConnect
+
+    @classmethod
+    def removeSocket(cls, uid):
+        cls.onlineSockets.pop(uid)
