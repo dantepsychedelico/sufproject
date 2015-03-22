@@ -8,7 +8,7 @@ from socketProtocal import socketProtocal as protocal
 ## debug and log tools
 import sys, logging, traceback
 LOG_FILE = "python-socket-server.log"
-logging.basicConfig(filename='example.log', level=logging.DEBUG, \
+logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG, \
             format='%(asctime)s %(message)s')
 
 
@@ -25,35 +25,30 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         logging.info("start conn {}".format(self.client_address[0]))
         try:
+            clientIp = self.client_address[0]
+            rt = router(self.request)
             while True:
                 header = self.request.recv(2)
                 if not bool(header):
                     logging.info("stop conn: {}".format(self.client_address[0]))
                     return
-                # self.request is the TCP socket connected to the client
                 buflen, = struct.unpack('!H', header)
-                clientIp = self.client_address[0]
                 logging.info("{} wrote: length {}".format(clientIp, buflen))
-                response = protocal.decrypt(self.request.recv(buflen))
-                protocal.encrypt
-                logging.info("{} report: length {}".format(clientip, md.reportBuflen))
+                reqBinary = protocal.decrypt(self.request.recv(buflen))
+                print(struct.pack('!H', buflen)+reqBinary)
+                buflen, resBinary = protocal.encrypt(rt.Ctrl(reqBinary))
+                print(struct.pack('!H', buflen)+resBinary)
+                self.request.sendall(struct.pack('!H', buflen)+resBinary)
+                logging.info("{} report: length {}".format(clientIp, buflen))
         except BaseException:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback, file=LOG_FILE)
+            with open(LOG_FILE, "a") as fn:
+                traceback.print_exception(exc_type, exc_value, exc_traceback, file=fn)
+            print (traceback.print_exc())
+            self.request.close()
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
-
-class User:
-    id = 0
-    def __init__(self, uid=0):
-        if uid:
-            self.id = uid
-        else:
-            self.__class__.id += 1
-
-    def setSocket(self, conn):
-        self.socket = conn
 
 class Room:
     maxRoomId = 0
@@ -78,6 +73,7 @@ if __name__ == "__main__":
     # used $python3 pySocketServer.py localhost 9999
     # Create the server, binding to localhost on port argv[1]
     server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
+    socketserver.TCPServer.allow_reuse_address = True
 
     ## chat {"method": "chat", "id": 1, "roomid": 10, type: "content", "content": "hello"}
     # Activate the server; this will keep running until you

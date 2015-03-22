@@ -1,17 +1,50 @@
 
 import json, time
 
+from Users import Users
+from mongoCtrl import mongoCtrl as mCtrl
+
+DB_HOST = "127.0.0.1"
+DB_PORT = 27017
+DB_NAME = "test"
+
 class router:
+    def __init__(self, socket):
+        self.socket = socket
+        self.uid = None
+        self.mctrl = mCtrl(DB_HOST, DB_PORT, DB_NAME)
+        self.__route = {
+                "new": self.newUser, 
+                "online": self.updateSocket
+                }
 
-    def __init__(self, buflen, request):
-        self.buflen = buflen
-        self.request = request
+    def Ctrl(self, reqBinary):
+        data = json.loads(reqBinary.decode())
+        method = data["method"]
+        if self.uid is None:
+            self.uid = data.get("uid")
+        res = self.__route[method](data)
+        res["method"] = method
+        res["status"] = "ok"
+        return json.dumps(res).encode()
 
-    def Ctrl(self):
-        self.data = json.loads(self.request.recv(self.buflen).decode())
-        bjson = json.dumps(self.resolve(json.loads(data.decode()))).encode()
-        self.request.sendall(struct.pack('!H', len(bjson))+bjson)
+    def newUser(self, data):
+        ## uid: user id
+        ## sid: security id
+        self.uid = Users.createUser(self.socket)
+        self.sid = int(time.time())
+        self.mctrl.signUp(self.uid, self.sid)
+        return {"uid": self.uid, "sid": hex(self.sid)[2:]}
+
+    def updateSocket(self, data):
+        Users.updateSocket(self.socket)
+        return {"uid": self.uid}
+
+    def newRoom(self, data):
         return
+
+    def joinRoom(self, data):
+        return 
 
     def resolve(self, reqjson):
         method = reqjson["method"]

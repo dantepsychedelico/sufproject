@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 import socketserver, json, struct, time
 
+from math import ceil, log2
+
 users = {}
 rooms = {}
 class MyTCPHandler(socketserver.BaseRequestHandler):
@@ -18,7 +20,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             header = self.request.recv(2)
             if bool(header):
                 buflen, = struct.unpack('!H', header)
-                data = self.request.recv(buflen)
+                data = self.request.recv(2**(buflen-1).bit_length())
                 clientip = self.client_address[0]
                 print("{} wrote: {}".format(clientip, header+data))
                 rjson = self.resolve(json.loads(data.decode()))
