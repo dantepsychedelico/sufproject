@@ -1,5 +1,16 @@
 #!/usr/bin/python3
-import socketserver, json, struct, time
+import socketserver, json, struct
+
+from router import router
+
+from socketProtocal import socketProtocal as protocal
+
+## debug and log tools
+import sys, logging, traceback
+LOG_FILE = "python-socket-server.log"
+logging.basicConfig(filename='example.log', level=logging.DEBUG, \
+            format='%(asctime)s %(message)s')
+
 
 users = {}
 rooms = {}
@@ -12,70 +23,23 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     client.
     """
     def handle(self):
-        while True:
-            # self.request is the TCP socket connected to the client
-            print("start conn {}".format(self.client_address[0]))
-            data = self.request.recv(2)
-            if bool(data):
-                buflen, = struct.unpack('!H', data)
-                data = self.request.recv(buflen)
-                clientip = self.client_address[0]
-                print("{} wrote: {}".format(clientip, data))
-                rjson = self.resolve(json.loads(data.decode()))
-                bjson = json.dumps(rjson).encode()
-                print("{} report: {}".format(clientip, struct.pack('!H', len(bjson))+bjson))
-                self.request.sendall(struct.pack('!H', len(bjson))+bjson)
-            else:
-                print("stop conn: {}".format(self.client_address[0]))
-                return
-
-    def resolve(self, reqjson):
-        method = reqjson["method"]
-        if method == "new":
-            user = User()
-            user.setSocket(self)
-            users[user.id] = user
-            rjson = {"status": "ok", "id": user.id}
-        elif method == "online":
-            user = User(reqjson["id"])
-            user.setSocket(self)
-            users[user.id] = user
-            rjson = {"status": "ok"}
-        elif method == "newroom":
-            room = Room()
-            room.addMember(reqjson["id"])
-            rooms[room.roomId] = room   ## save room status
-            rjson = { "status": "ok", "roomid": room.roomId, 
-                    "roomname": reqjson["roomname"],
-                    "members": room.getMembers(),
-                    "createtime": int(time.time()),
-                    "alivetime": reqjson["alivetime"]}
-            print(room.members)
-        elif method == "join":
-            room = rooms[reqjson["roomid"]]
-            room.addMember(reqjson["id"])
-            rjson = {"status": "ok", "roomid": room.roomId,
-                    "members": room.getMembers(), "alivetime": 1000,
-                    "createtime": 1426858964, "roomname": "room"}
-            print(room.members)
-        elif method == "chat":
-            uid = reqjson["id"]
-            room = rooms[reqjson["roomid"]]
-            fjson = {"status": "ok", "id": uid, "roomid": reqjson["roomid"], 
-                    "type": reqjson["type"], "content": reqjson["content"], 
-                    "time": int(time.time())}
-            for memberId in room.members:
-                if memberId==uid:
-                    continue
-                else:
-                    fjson["method"] = "chat"
-                    bjson = json.dumps(fjson).encode()
-                    users[memberId].socket.request.sendall(struct.pack('!H', len(bjson))+bjson)
-            rjson = {"stauts": "ok", "id": uid}
-        else:
-            assert False, "unknown method: {}".format(method)
-        rjson["method"] = method
-        return rjson
+        logging.info("start conn {}".format(self.client_address[0]))
+        try:
+            while True:
+                header = self.request.recv(2)
+                if not bool(header):
+                    logging.info("stop conn: {}".format(self.client_address[0]))
+                    return
+                # self.request is the TCP socket connected to the client
+                buflen, = struct.unpack('!H', header)
+                clientIp = self.client_address[0]
+                logging.info("{} wrote: length {}".format(clientIp, buflen))
+                response = protocal.decrypt(self.request.recv(buflen))
+                protocal.encrypt
+                logging.info("{} report: length {}".format(clientip, md.reportBuflen))
+        except BaseException:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_exception(exc_type, exc_value, exc_traceback, file=LOG_FILE)
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
