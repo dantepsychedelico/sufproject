@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import socketserver
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
@@ -12,13 +13,13 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         # self.request is the TCP socket connected to the client
         while True:
-            self.data = self.request.recv(1024).strip()
+            self.data = self.request.recv(1024)
+            print ("{} wrote: {}".format(self.client_address[0], self.data))
             if not bool(self.data):
+                print("stop conn")
                 return
-            print ("{} wrote:".format(self.client_address[0]))
-            print (self.data)
             # just send back the same data, but upper-cased
-            self.request.sendall(self.data)
+            # self.request.sendall(self.data)
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
@@ -26,6 +27,7 @@ if __name__ == "__main__":
     from sys import argv
     HOST, PORT = argv[1], int(argv[2])
 
+    socketserver.TCPServer.allow_reuse_address = True
     server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
 
     # Activate the server; this will keep running until you
