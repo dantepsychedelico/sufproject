@@ -4,15 +4,12 @@ import json, time
 from Users import Users
 from mongoCtrl import mongoCtrl as mCtrl
 
-DB_HOST = "127.0.0.1"
-DB_PORT = 27017
-DB_NAME = "test"
-
 class router:
+    mctrl = mCtrl()
+
     def __init__(self, socket):
         self.socket = socket
         self.uid = None
-        self.mctrl = mCtrl(DB_HOST, DB_PORT, DB_NAME)
         self.__route = {
                 "new": self.newUser, 
                 "online": self.updateSocket

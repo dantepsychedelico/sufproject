@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import socketserver
+import socketserver, time
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
     """
@@ -12,14 +12,15 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         # self.request is the TCP socket connected to the client
+#        time.sleep(1)
         while True:
-            self.data = self.request.recv(1024)
-            print ("{} wrote: {}".format(self.client_address[0], self.data))
-            if not bool(self.data):
+            self.data = self.request.recvmsg(1024)
+            print ("{} wrote: ".format(self.client_address[0]), self.data)
+            if not bool(self.data[0]):
                 print("stop conn")
                 return
             # just send back the same data, but upper-cased
-            # self.request.sendall(self.data)
+#            self.request.sendall(self.data)
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass

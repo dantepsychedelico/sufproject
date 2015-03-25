@@ -1,12 +1,13 @@
 
-from mongoModel import mongoModel
+from mongoModel import mongo
 
 class mongoCtrl:
-    def __init__(self, DB_HOST, DB_PORT, DB_NAME):
-        self.model = mongoModel(DB_HOST, DB_PORT, DB_NAME)
+    mongo = mongo
 
     def signUp(self, uid, sid):
-        self.model.createUser(uid, sid)
+        self.mongo.createUser(uid, sid)
 
-    def getMaxUid(self):
-        return self.model.getMaxUid()
+    @classmethod
+    def getMaxUid(cls):
+        return cls.mongo.getMaxUid()
+

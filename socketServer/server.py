@@ -1,8 +1,7 @@
 #!/usr/bin/python3
+
 import socketserver, json, struct
-
 from router import router
-
 from socketProtocal import socketProtocal as protocal
 
 ## debug and log tools
@@ -68,7 +67,8 @@ class Room:
 
 if __name__ == "__main__":
     from sys import argv
-    HOST, PORT = argv[1], int(argv[2])
+    HOST = argv[1] if len(argv) > 1 else "127.0.0.1"
+    PORT = argv[2] if len(argv) > 2 else 30000
 
     # used $python3 pySocketServer.py localhost 9999
     # Create the server, binding to localhost on port argv[1]
