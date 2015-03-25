@@ -21,4 +21,4 @@ start server
    $ cd socketServer
    $ ./server.py
    ## or
-   $ ./server.py 172.0.0.1
+   $ ./server.py <IP> <PORT>
