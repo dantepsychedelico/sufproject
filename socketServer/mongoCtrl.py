@@ -2,12 +2,24 @@
 from mongoModel import mongo
 
 class mongoCtrl:
-    mongo = mongo
+    currentRoomId = mongo.getMaxRoomId()
 
-    def signUp(self, uid, sid):
-        self.mongo.createUser(uid, sid)
+    @staticmethod
+    def signUp(uid, sid):
+        mongo.createUser(uid, sid)
 
-    @classmethod
-    def getMaxUid(cls):
-        return cls.mongo.getMaxUid()
+    @staticmethod
+    def getMaxUid():
+        return mongo.getMaxUid()
 
+    @staticmethod
+    def getMaxRoomId():
+        return mongo.getMaxRoomid()
+
+    @staticmethod
+    def newRoom(uid, roomname, alivetime):
+        __class__.currentRoomId += 1
+        createtime = mongo.createRoom(__class__.currentRoomId, uid, roomname, alivetime)
+        return __class__.currentRoomId, createtime
+
+mctrl = mongoCtrl()

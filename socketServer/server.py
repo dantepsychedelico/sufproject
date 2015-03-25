@@ -49,22 +49,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
-class Room:
-    maxRoomId = 0
-    def __init__(self, roomId=0):
-        self.members = set()
-        if roomId:
-            self = rooms[roomId]
-        else:
-            self.__class__.maxRoomId += 1
-            self.roomId = self.maxRoomId
-
-    def addMember(self, uid):
-        self.members.add(uid)
-
-    def getMembers(self):
-        return list(self.members)
-
 if __name__ == "__main__":
     from sys import argv
     HOST = argv[1] if len(argv) > 1 else "127.0.0.1"
