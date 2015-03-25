@@ -3,20 +3,20 @@ sufproject
 
 build tokumx with docker
 
-.. code-block: bash
+.. code-block:: bash
 
     $ cd tokumx
     $ ./tokumx.sh build
 
 create mongod container
 
-.. code-block: bash
+.. code-block:: bash
 
     $ ./tokumx.sh mongod tokumx.conf
 
 start server
 
-.. code-block: bash
+.. code-block:: bash
 
    $ cd socketServer
    $ ./server.py
