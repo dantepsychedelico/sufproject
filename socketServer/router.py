@@ -1,7 +1,7 @@
 
 import json, time
 
-from Users import Users
+from Users import users
 from mongoCtrl import mongoCtrl as mctrl
 
 class router:
@@ -10,7 +10,10 @@ class router:
         self.uid = None
         self.__route = {
                 "new": self.newUser, 
-                "online": self.updateSocket
+                "online": self.updateSocket,
+                "newroom": self.newRoom,
+                "join": self.joinRoom,
+                "chat": self.chat
                 }
 
     def Ctrl(self, reqBinary):
@@ -21,31 +24,37 @@ class router:
         res = self.__route[method](data)
         res["method"] = method
         res["status"] = "ok"
-        return json.dumps(res).encode()
+        return res
 
     def newUser(self, data):
         ## uid: user id
         ## sid: security id
-        self.uid = Users.createUser(self.socket)
+        self.uid = users.createUser(self.socket)
         self.sid = int(time.time())
         mctrl.signUp(self.uid, self.sid)
         return {"uid": self.uid, "sid": hex(self.sid)[2:]}
 
     def updateSocket(self, data):
         self.uid = data["uid"]
-        Users.updateSocket(self.uid, self.socket)
+        users.updateSocket(self.uid, self.socket)
         return {"uid": self.uid}
 
     def stopSocket(self):
-        Users.removeSocket(self.uid)
+        users.removeSocket(self.uid)
 
     def newRoom(self, data):
         roomid, createtime = mctrl.newRoom(**data)
         return {"roomid": roomid, "createtime": createtime}
 
     def joinRoom(self, data):
-        return 
+        res = mctrl.joinRoom(data["roomid"], self.uid)
+        return res
 
     def chat(self, data):
-        return
+        members, msg = mctrl.chatRoom(data["roomid"], data["msg"])
+        data["msg"] = msg
+        for member in members:
+            if member!=self.uid:
+                users.sendSocket(members, data)
+        return {"uid": self.uid}
 

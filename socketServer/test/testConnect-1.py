@@ -16,8 +16,9 @@ print(res)
 s.sendall(res)
 getdata = s.recv(1024)
 print('Received', repr(getdata))
+jj = json.loads(getdata[2:].decode())
 
-data = {"method": "online", "uid": 1}
+data = {"method": "online", "uid": jj["uid"]}
 bson = json.dumps(data).encode()
 res = struct.pack('!H', len(bson))+bson
 print(res)

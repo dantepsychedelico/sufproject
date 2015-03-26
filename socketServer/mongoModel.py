@@ -18,11 +18,43 @@ class mongoModel:
         self.db.users.insert({"uid": uid, "sid": sid, 
             "createtime": int(time.time())})
     
+    def updateUser(self, uid, sid, **args):
+        self.db.users.update({
+            "uid": uid,
+            "sid": sid
+            }, {"$set": args,
+                "$currentDate": {"last": True }
+                })
+
     def createRoom(self, roomid, uid, roomname, alivetime):
         createtime = int(time.time())
-        self.db.rooms.insert({"roomid": roomid, "createid": uid, 
-            "members": [uid], "createtime": createtime,
-            "alivetime": alivetime, "roomname": roomname})
+        self.db.rooms.insert({"roomid": roomid, 
+            "createid": uid, 
+            "members": [uid], 
+            "createtime": createtime,
+            "alivetime": alivetime, 
+            "roomname": roomname,
+            "msg": []})
+
+    def readRoom(self, roomid, keys):
+        return self.db.rooms.find({"roomid": roomid},
+                {key: 1 for key in keys})
+
+    def updateRoom(self, roomid, **args):
+        self.db.rooms.update({
+            "roomid": roomid 
+            }, {"$set": args,
+                "$currentDate": {"last": True }
+                })
+
+    def pushRoomMsg(self, roomid, msg):
+        msg["time"] = int(time.time())
+        self.db.rooms.update({
+            "roomid": roomid
+            }, {"$push": {"msg": {"$each": [msg]}},
+                "$currentDate": {"last": True}
+                })
+        return msg
 
     def getMaxUid(self):
         cur = self.db.users.find().sort("uid", pymongo.DESCENDING).limit(1)

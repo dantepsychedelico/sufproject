@@ -3,6 +3,7 @@
 import socketserver, json, struct
 from router import router
 from socketProtocal import socketProtocal as protocal
+from Users import users
 
 ## debug and log tools
 import sys, logging, traceback
@@ -33,10 +34,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 logging.info("{} wrote: length {}".format(clientIp, buflen))
                 reqBinary = protocal.decrypt(self.request.recv(buflen))
                 print(struct.pack('!H', buflen)+reqBinary)
-                buflen, resBinary = protocal.encrypt(rt.Ctrl(reqBinary))
-                print(struct.pack('!H', buflen)+resBinary)
-                self.request.sendall(struct.pack('!H', buflen)+resBinary)
-                logging.info("{} report: length {}".format(clientIp, buflen))
+                res = rt.Ctrl(reqBinary)
+                users.sendSocket(rt.uid, res)
         except BaseException:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             with open(LOG_FILE, "a") as fn:
@@ -54,13 +53,9 @@ if __name__ == "__main__":
     HOST = argv[1] if len(argv) > 1 else "127.0.0.1"
     PORT = argv[2] if len(argv) > 2 else 30000
 
-    # used $python3 pySocketServer.py localhost 9999
-    # Create the server, binding to localhost on port argv[1]
     server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
     socketserver.TCPServer.allow_reuse_address = True
 
-    ## chat {"method": "chat", "id": 1, "roomid": 10, type: "content", "content": "hello"}
-    # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     server.serve_forever()
 
