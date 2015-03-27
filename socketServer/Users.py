@@ -13,6 +13,9 @@ class Users:
         return self.currentUid
 
     def updateSocket(self, uid, socketConnect):
+        if uid in self.onlineSockets:
+            if self.onlineSockets[uid] is not socketConnect:
+                self.onlineSockets[uid].close()
         self.onlineSockets[uid] = socketConnect
 
     def removeSocket(self, uid):

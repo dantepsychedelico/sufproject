@@ -35,10 +35,16 @@ class mongoModel:
             "alivetime": alivetime, 
             "roomname": roomname,
             "msg": []})
+        return createtime
 
     def readRoom(self, roomid, keys):
-        return self.db.rooms.find({"roomid": roomid},
+        cur = self.db.rooms.find({"roomid": roomid},
                 {key: 1 for key in keys})
+        assert cur.count() == 1, "readRoom non unique"
+        room = cur[0]
+        room.pop("_id")
+        return room
+
 
     def updateRoom(self, roomid, **args):
         self.db.rooms.update({

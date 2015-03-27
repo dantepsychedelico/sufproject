@@ -22,6 +22,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     """
     def handle(self):
         logging.info("start conn {}".format(self.client_address[0]))
+        print("start conn {}".format(self.client_address[0]))
         try:
             clientIp = self.client_address[0]
             rt = router(self.request)
@@ -32,7 +33,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                     return
                 buflen, = struct.unpack('!H', header)
                 logging.info("{} wrote: length {}".format(clientIp, buflen))
-                reqBinary = protocal.decrypt(self.request.recv(buflen))
+                reqBinary = protocal.decrypt(self.request.recv(2**(buflen-1).bit_length()))
                 print(struct.pack('!H', buflen)+reqBinary)
                 res = rt.Ctrl(reqBinary)
                 users.sendSocket(rt.uid, res)
@@ -51,7 +52,7 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 if __name__ == "__main__":
     from sys import argv
     HOST = argv[1] if len(argv) > 1 else "127.0.0.1"
-    PORT = argv[2] if len(argv) > 2 else 30000
+    PORT = int(argv[2]) if len(argv) > 2 else 30000
 
     server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
     socketserver.TCPServer.allow_reuse_address = True

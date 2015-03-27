@@ -17,16 +17,16 @@ class mongoCtrl:
         return mongo.getMaxRoomid()
 
     @staticmethod
-    def newRoom(uid, roomname, alivetime):
+    def newRoom(uid, roomname, alivetime, **args):
         __class__.currentRoomId += 1
-        createtime = mongo.updateRoom(__class__.currentRoomId, uid, 
+        createtime = mongo.createRoom(__class__.currentRoomId, uid, \
                 roomname, alivetime)
         return __class__.currentRoomId, createtime
 
     @staticmethod
     def joinRoom(roomid, uid):
         room = mongo.readRoom(roomid, ["roomid", "members", "roomname", 
-            "creattime", "alivetime"])
+            "createtime", "alivetime"])
         members = room["members"]
         if uid not in members:
             members.append(uid)

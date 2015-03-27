@@ -1,29 +1,57 @@
 #!/usr/bin/env python3
 #
 # the e2e testing
-import socket, struct, json
+from sys import argv
+from socketTest import socketTest
+import time
+from unittest import TestCase
+tc = TestCase()
 
-HOST = 'localhost'
-PORT = 30000
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((HOST, PORT))
+HOST = argv[1] if len(argv) > 1 else "127.0.0.1"
+PORT = int(argv[2]) if len(argv) > 2 else 30000
 
-data = {"method": "new"}
-bson = json.dumps(data).encode()
-res = struct.pack('!H', len(bson))+bson
-print("start connect")
-print(res)
-s.sendall(res)
-getdata = s.recv(1024)
-print('Received', repr(getdata))
-jj = json.loads(getdata[2:].decode())
+st = socketTest(HOST, PORT)
+st.connect()
+## test new
+res = st.producer({"method": "new"}).comsumer()
+uid = res.pop("uid")
+sid = res.pop("sid")
+tc.assertDictEqual(res, {"status": "ok", "method": "new"})
 
-data = {"method": "online", "uid": jj["uid"]}
-bson = json.dumps(data).encode()
-res = struct.pack('!H', len(bson))+bson
-print(res)
-s.sendall(res)
-getdata = s.recv(1024)
-print('Received', repr(getdata))
+## test online
+res = st.producer({"method": "online", "uid": uid}).comsumer()
+tc.assertEqual(res.pop("uid"), uid)
+tc.assertDictEqual(res, {"status": "ok", "method": "online"})
 
-s.close()
+## test new room
+alivetime = 1000
+roomname = "myFirstRoom"
+res = st.producer({"method": "newroom", "uid": uid, "roomname": roomname, "alivetime": alivetime}).comsumer()
+roomid = res.pop("roomid")
+createtime = res.pop("createtime")
+tc.assertDictEqual(res, {"status": "ok", "method": "newroom"})
+
+## 10s threshold
+tc.assertLessEqual(createtime, int(time.time()))   
+tc.assertGreater(createtime, int(time.time())-10)
+
+## test join room
+st.disconnect()
+st.connect()
+res = st.producer({"method": "new"}).comsumer()
+uid2 = res.pop("uid")
+sid2 = res.pop("sid")
+tc.assertEqual(res, {"status": "ok", "method": "new"})
+res = st.producer({"method": "join", "uid": uid, "roomid": roomid}).comsumer()
+roomid2 = res.pop("roomid")
+tc.assertEqual(roomid2, roomid)
+createtime2 = res.pop("createtime")
+tc.assertEqual(createtime2, createtime)
+alivetime2 = res.pop("alivetime")
+tc.assertEqual(alivetime2, alivetime)
+members = res.pop("members")
+members.sort()
+tc.assertEqual(members, [uid, uid2])
+tc.assertDictEqual(res, {"status": "ok", "method": "join", "roomname": roomname})
+st.disconnect()
+print("done")
