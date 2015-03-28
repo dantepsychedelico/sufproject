@@ -31,9 +31,9 @@ Docker for python socket server
 
    # build docker python socket server
    $ cd socketServer
-   $ docker build -t python-socket-server:0.2 .
+   $ docker build -t python-socket-server:0.3 .
    # run server
-   $ docker run -d --name python-socket-server-0.2 --link suf_mongo:db -v $PWD/log:/home/python/log -p 30000:30000 python-socket-server:0.2
+   $ docker run -d --name python-socket-server-0.3 --link suf_mongo:db -v $PWD/log:/home/python/log -p 30000:30000 python-socket-server:0.3
 
 
 
