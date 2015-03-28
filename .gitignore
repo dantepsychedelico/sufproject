@@ -4,8 +4,8 @@ tokumx/.dbshell
 __pycache__/
 socketServer/__pycache__/
 *.swp
-mongo3/data
-mongo3/log
+mongo3/data/*
+mongo3/log/*
 mongo3/.dbshell
 *tar.gz
 *.log
