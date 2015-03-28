@@ -21,8 +21,7 @@ Docker for mongo server
 
    # build docker mongo server
    $ docker pull mongo:3
-   $ mkdir -p mongo3/data && cd mongo3/data
-   $ docker run -d --name suf_mongo -v $PWD:/home/mongodb mongo:3
+   $ docker run -d --name suf_mongo -v $PWD/data:/data/db mongo:3
 
 
 Docker for python socket server 
@@ -34,7 +33,7 @@ Docker for python socket server
    $ cd socketServer
    $ docker build -t python-socket-server:0.2 .
    # run server
-   $ docker run -it --link suf_mongo:db -v $PWD/log:/home/python/log -p 30000:30000 --rm python-socket-server:0.2
+   $ docker run -d --name python-socket-server-0.2 --link suf_mongo:db -v $PWD/log:/home/python/log -p 30000:30000 python-socket-server:0.2
 
 
 
