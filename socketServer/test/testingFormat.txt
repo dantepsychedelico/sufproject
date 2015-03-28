@@ -1,18 +1,25 @@
 ## new id
 CLIENT {"method": "new"}
 SERVER {"status": "ok", "method": "new", "uid": 1}
+
 ## online
 CLIENT {"method": "online", "uid": 1}
 SERVER {"status": "ok", "method": "online"}
+
 ## new room
 CLIENT {"method": "newroom", "uid": 1, "roomname": "myFirstRoom", "alivetime": 1000}
 # SERVER {"status": "ok", "method": "newroom", "roomid": 1, "roomname": "myFirstRoom", "members": [1], "createtime": 1234, "alivetime": 1000}
 SERVER {"status": "ok", "method": "newroom", "roomid": 1, "createtime": 1234}
+
 ## join room
 CLIENT {"method": "join", "uid":2, "roomid": 1}
 # SERVER {"status": "ok", "method": "join", "roomid": 1, "roomname": "myFristRoom", "createtime": 1234, "alivetime": 1000}
 SERVER {"status": "ok", "method": "join", "roomid": 1, "roomname": "myFristRoom", "createtime": 1234, "alivetime": 1000, members: [1,2]}
+
 ## user that id is 1 chat in room with roomid is 1
-CLIENT with id is 1 {"method": "chat", "roomid": 1, "uid": 1, "type": "content", "content": "hello, I'm Zac"}
-SERVER to CLIENT(id=1) {"status": "ok", "method": "chat", "uid": 1}
-SERVER to CLIENT(id=2) {"status": "ok", "method": "chat", "roomid": 1, "uid": 1, "type": "content", "content": "hello, I'm Zac", time: 1234}
+CLIENT with id is 1 {"method": "chat", "roomid": 1, "uid": 1, "mtype": "text", "content": "hello, I'm Zac"}
+SERVER to CLIENT(id=1) {"status": "ok", "method": "chat", "uid": 1, "time": 1234}
+SERVER to CLIENT(id=2) {"status": "ok", "method": "chat", "roomid": 1, "uid": 1, "mtype": "text", "content": "hello, I'm Zac", time: 1234}
+
+## send logs
+## SERVER to CLIENT {"status": "ok", "method": "chat", "logs": [{"roomid": 1, "uid": 1, "mtype": "content", "content": "hello, I'm Zac", time: 1234},]}

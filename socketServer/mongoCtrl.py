@@ -34,9 +34,9 @@ class mongoCtrl:
         return room
 
     @staticmethod
-    def chatRoom(roomid, msg):
+    def chatRoom(roomid, **args):
         members = mongo.readRoom(roomid, ["members"])["members"]
-        msg = mongo.pushRoomMsg(roomid, msg)
-        return members, msg
+        msg = mongo.pushRoomMsg(roomid, **args)
+        return members, msg["time"]
 
 mctrl = mongoCtrl()

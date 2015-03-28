@@ -52,9 +52,10 @@ class mongoModel:
             }, {"$set": args,
                 "$currentDate": {"last": True }
                 })
-
-    def pushRoomMsg(self, roomid, msg):
-        msg["time"] = int(time.time())
+    ## mtype: msg type; mtext: msg text
+    def pushRoomMsg(self, roomid, uid, mtype, content, **args):
+        msg = {"uid": uid, "mtype": mtype, "content": content,
+                "time": int(time.time())}
         self.db.rooms.update({
             "roomid": roomid
             }, {"$push": {"msg": {"$each": [msg]}},

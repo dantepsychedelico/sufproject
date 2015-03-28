@@ -51,10 +51,11 @@ class router:
         return res
 
     def chat(self, data):
-        members, msg = mctrl.chatRoom(data["roomid"], data["msg"])
-        data["msg"] = msg
+        members, time = mctrl.chatRoom(**data)
+        data["time"] = time
+        data["status"] = "ok"
         for member in members:
             if member!=self.uid:
-                users.sendSocket(members, data)
-        return {"uid": self.uid}
+                users.sendSocket(member, data)
+        return {"uid": self.uid, "time": time}
 
