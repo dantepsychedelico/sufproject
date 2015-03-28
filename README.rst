@@ -14,11 +14,27 @@ create mongod container
 
     $ ./tokumx.sh mongod tokumx.conf
 
-start server
+
+Docker for mongo server
+-----------------------
+.. code-block:: bash
+
+   # build docker mongo server
+   $ docker pull mongo:3
+   $ mkdir -p mongo3/data && cd mongo3/data
+   $ docker run -d --name suf_mongo -v $PWD:/home/mongodb mongo:3
+
+
+Docker for python socket server 
+-------------------------------
 
 .. code-block:: bash
 
+   # build docker python socket server
    $ cd socketServer
-   $ ./server.py
-   ## or
-   $ ./server.py <IP> <PORT>
+   $ docker build -t python-socket-server:0.2 .
+   # run server
+   $ docker run -it --link suf_mongo:db -v $PWD/log:/home/python/log -p 30000:30000 --rm python-socket-server:0.2
+
+
+

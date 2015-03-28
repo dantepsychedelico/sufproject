@@ -7,9 +7,6 @@ from Users import users
 
 ## debug and log tools
 import sys, logging, traceback
-LOG_FILE = "python-socket-server.log"
-logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG, \
-            format='%(asctime)s %(message)s')
 ##
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
@@ -51,8 +48,12 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
 if __name__ == "__main__":
     from sys import argv
-    HOST = argv[1] if len(argv) > 1 else "127.0.0.1"
-    PORT = int(argv[2]) if len(argv) > 2 else 30000
+    from os import getenv
+    HOST = argv[1] if len(argv) > 1 else getenv("HOST", "127.0.0.1")
+    PORT = int(argv[2]) if len(argv) > 2 else int(getenv("PORT", 3000))
+    LOG_FILE = getenv("LOG_FILE", "log/python-socket-server.log")
+    logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG, \
+                format='%(asctime)s %(message)s')
 
     server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
     socketserver.TCPServer.allow_reuse_address = True

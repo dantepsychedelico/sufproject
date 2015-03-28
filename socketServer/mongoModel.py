@@ -2,12 +2,11 @@
 ## python mongo model
 
 import pymongo, time
+from os import getenv
 
-CONFIG = {
-        "DB_HOST": "127.0.0.1", 
-        "DB_PORT": 27017,
-        "DB_NAME": "test"
-        }
+DB_HOST= getenv("DB_PORT_27017_TCP_ADDR", "127.0.0.1")
+DB_PORT= int(getenv("DB_PORT_27017_TCP_PORT", 27017))
+DB_NAME= getenv("DB_COLLECTION", "test")
 
 class mongoModel:
     def __init__(self, DB_HOST, DB_PORT, DB_NAME):
@@ -77,4 +76,4 @@ class mongoModel:
         else:
             return 0
 
-mongo = mongoModel(**CONFIG)
+mongo = mongoModel(DB_HOST, DB_PORT, DB_NAME)
