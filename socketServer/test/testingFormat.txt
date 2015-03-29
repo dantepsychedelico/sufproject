@@ -1,6 +1,6 @@
 ## new id
 CLIENT {"method": "new"}
-SERVER {"status": "ok", "method": "new", "uid": 1}
+SERVER {"status": "ok", "method": "new", "uid": 1, "sid": 512345}
 
 ## online
 CLIENT {"method": "online", "uid": 1}

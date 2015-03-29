@@ -44,6 +44,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             return
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    """ this class is enable socket thread"""
     pass
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ Docker for mongo server
 
    # build docker mongo server
    $ docker pull mongo:3
+   $ chcon -Rt svirt_sandbox_file_t data
    $ docker run -d --name suf_mongo -v $PWD/data:/data/db mongo:3
 
 
@@ -35,5 +36,22 @@ Docker for python socket server
    # run server
    $ docker run -d --name python-socket-server-0.2 --link suf_mongo:db -v $PWD/log:/home/python/log -p 30000:30000 python-socket-server:0.2
 
+python socket server framework
 
+::
+
+    socketServer
+    ├── Dockerfile
+    ├── log
+    │   └── python-server.log                   ## the socket server log file location
+    ├── mongoCtrl.py                            ## mongodb controller
+    ├── mongoModel.py                           ## mongodb model, connect to mongo
+    ├── router.py                               ## the method's router
+    ├── server.py                               ## main socket server
+    ├── socketProtocal.py                       ## socket server protocal
+    ├── test
+    │   ├── socketTest.py
+    │   ├── testConnect-1.py
+    │   └── testingFormat.txt                   ## json's format
+    └── Users.py                                ## store sockets' conneciton of the online user
 

@@ -10,14 +10,17 @@ class mongoCtrl:
 
     @staticmethod
     def getMaxUid():
+        """ get number of current max uid """
         return mongo.getMaxUid()
 
     @staticmethod
     def getMaxRoomId():
+        """ get number of current max roomid """
         return mongo.getMaxRoomid()
 
     @staticmethod
     def newRoom(uid, roomname, alivetime, **args):
+        """ create the newroom and return (roomid, createtime) """
         __class__.currentRoomId += 1
         createtime = mongo.createRoom(__class__.currentRoomId, uid, \
                 roomname, alivetime)

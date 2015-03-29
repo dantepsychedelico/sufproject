@@ -6,6 +6,7 @@ from mongoCtrl import mongoCtrl as mctrl
 
 class router:
     def __init__(self, socket):
+        """ every online user have one router object and used 'Ctrl' method to control request and response """
         self.socket = socket
         self.uid = None
         self.__route = {
@@ -27,22 +28,24 @@ class router:
         return res
 
     def newUser(self, data):
-        ## uid: user id
-        ## sid: security id
+        """ uid: userid; sid: security id """
         self.uid = users.createUser(self.socket)
         self.sid = int(time.time())
         mctrl.signUp(self.uid, self.sid)
         return {"uid": self.uid, "sid": hex(self.sid)[2:]}
 
     def updateSocket(self, data):
+        """ update socket connection for the same user """
         self.uid = data["uid"]
         users.updateSocket(self.uid, self.socket)
         return {"uid": self.uid}
 
     def stopSocket(self):
+        """ remove the socket connection for the user """
         users.removeSocket(self.uid)
 
     def newRoom(self, data):
+        """ """
         roomid, createtime = mctrl.newRoom(**data)
         return {"roomid": roomid, "createtime": createtime}
 
