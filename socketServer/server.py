@@ -19,7 +19,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     """
     def handle(self):
         logging.info("start conn {}".format(self.client_address[0]))
-        print("start conn {}".format(self.client_address[0]))
         try:
             clientIp = self.client_address[0]
             rt = router(self.request)
@@ -31,14 +30,14 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 buflen, = struct.unpack('!H', header)
                 logging.info("{} wrote: length {}".format(clientIp, buflen))
                 reqBinary = protocal.decrypt(self.request.recv(2**(buflen-1).bit_length()))
-                print(struct.pack('!H', buflen)+reqBinary)
+                logging.debug(struct.pack('!H', buflen)+reqBinary)
                 res = rt.Ctrl(reqBinary)
                 users.sendSocket(rt.uid, res)
         except BaseException:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             with open(LOG_FILE, "a") as fn:
                 traceback.print_exception(exc_type, exc_value, exc_traceback, file=fn)
-            print (traceback.print_exc())
+            logging.error(traceback.print_exc())
             self.request.close()
             rt.stopSocket()
             return

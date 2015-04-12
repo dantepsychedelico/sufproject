@@ -26,4 +26,4 @@ WORKDIR /home/python
 
 VOLUME /home/python/log
 
-CMD ["python3", "server.py"]
+# CMD ["python3", "server.py"]
