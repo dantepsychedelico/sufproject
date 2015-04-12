@@ -24,9 +24,9 @@ class Users:
 
     def sendSocket(self, uid, res):
         buflen, resBinary = protocal.encrypt(json.dumps(res).encode())
+        logging.info("{} report: length {}".format(socket.getpeername(), buflen))
         logging.debug(pack('!H', buflen)+resBinary)
         socket = self.onlineSockets[uid]
         socket.sendall(pack('!H', buflen)+resBinary)
-        logging.info("{} report: length {}".format(socket.getpeername(), buflen))
 
 users = Users()
