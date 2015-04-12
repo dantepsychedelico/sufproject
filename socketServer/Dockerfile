@@ -13,12 +13,12 @@ RUN mkdir -p /home/python/log
 
 RUN pip3 install pymongo
 
-COPY *.py /home/python/
-
 ENV VERSION 0.3
 ENV PORT 30000
 ENV HOST 0.0.0.0
 ENV LOG_FILE log/python-server.log
+
+COPY *.py /home/python/
 
 WORKDIR /home/python
 
