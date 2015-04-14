@@ -66,13 +66,13 @@ res = st1.comsumer()
 time2 = res2.pop("time")
 tc.assertLessEqual(time2, sendtime+5)
 tc.assertGreaterEqual(time2, sendtime-5)
-tc.assertDictEqual(res2, {"status": "ok", "method": "chat", "uid": uid2})
+tc.assertDictEqual(res2, {"status": "sendok", "method": "chat", "uid": uid2})
 
 tc.assertEqual(res.pop("content"), content)
 time1 = res.pop("time")
 tc.assertLessEqual(time1, sendtime+5)
 tc.assertGreaterEqual(time1, sendtime-5)
-tc.assertDictEqual(res, {"status": "ok", "method": "chat", "roomid": roomid2, "uid": uid2, "mtype": "text"})
+tc.assertDictEqual(res, {"status": "getok", "method": "chat", "roomid": roomid2, "uid": uid2, "mtype": "text"})
 
 ## test st1 send msg to st2
 content = "hi, nice to meet u"
@@ -85,13 +85,13 @@ res2 = st2.comsumer()
 time1 = res1.pop("time")
 tc.assertLessEqual(time1, sendtime+5)
 tc.assertGreaterEqual(time1, sendtime-5)
-tc.assertDictEqual(res1, {"status": "ok", "method": "chat", "uid": uid})
+tc.assertDictEqual(res1, {"status": "sendok", "method": "chat", "uid": uid})
 # st2
 tc.assertEqual(res2.pop("content"), content)
 time2 = res2.pop("time")
 tc.assertLessEqual(time2, sendtime+5)
 tc.assertGreaterEqual(time2, sendtime-5)
-tc.assertDictEqual(res2, {"status": "ok", "method": "chat", "roomid": roomid, "uid": uid, "mtype": "text"})
+tc.assertDictEqual(res2, {"status": "getok", "method": "chat", "roomid": roomid, "uid": uid, "mtype": "text"})
 
 st2.disconnect()
 print("done")

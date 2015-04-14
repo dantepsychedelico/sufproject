@@ -24,7 +24,8 @@ class router:
             self.uid = data.get("uid")
         res = self.__route[method](data)
         res["method"] = method
-        res["status"] = "ok"
+        if "status" not in res:
+            res["status"] = "ok"
         return res
 
     def newUser(self, data):
@@ -56,9 +57,9 @@ class router:
     def chat(self, data):
         members, time = mctrl.chatRoom(**data)
         data["time"] = time
-        data["status"] = "ok"
+        data["status"] = "getok"
         for member in members:
             if member!=self.uid:
                 users.sendSocket(member, data)
-        return {"uid": self.uid, "time": time}
+        return {"uid": self.uid, "time": time, "status": "sendok"}
 
