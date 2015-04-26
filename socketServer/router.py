@@ -9,12 +9,14 @@ class router:
         """ every online user have one router object and used 'Ctrl' method to control request and response """
         self.socket = socket
         self.uid = None
+        self.token = None
         self.__route = {
                 "new": self.newUser, 
                 "online": self.updateSocket,
                 "newroom": self.newRoom,
                 "join": self.joinRoom,
-                "chat": self.chat
+                "chat": self.chat,
+                "updateToken": self.updateToken
                 }
 
     def Ctrl(self, reqBinary):
@@ -40,6 +42,14 @@ class router:
         self.uid = data["uid"]
         users.updateSocket(self.uid, self.socket)
         return {"uid": self.uid}
+
+    def updateToken(self, data):
+        """ update token for IOS device"""
+        self.token = data["token"]
+        self.uid = data["uid"]
+        self.sid = data["sid"]
+        mctrl.receiveToken(self.uid, self.sid, self.token)
+        return {"token": self.token}
 
     def stopSocket(self):
         """ remove the socket connection for the user """

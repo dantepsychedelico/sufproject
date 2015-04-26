@@ -15,8 +15,8 @@ class mongoModel:
 
     def createUser(self, uid, sid):
         self.db.users.insert({"uid": uid, "sid": sid, 
-            "createtime": int(time.time())})
-    
+            "createtime": int(time.time()), "token": None})
+
     def updateUser(self, uid, sid, **args):
         self.db.users.update({
             "uid": uid,
@@ -24,6 +24,20 @@ class mongoModel:
             }, {"$set": args,
                 "$currentDate": {"last": True }
                 })
+
+    def writeToken(self,uid ,sid , token):
+        self.db.users.update({
+            "uid": uid,
+            "sid": sid,
+            "token": token
+            })
+
+    def readToken(self, uid):
+        cur = self.db.users.find({"uid": uid})
+        if cur.count():
+            return cur[0]["token"]
+        else:
+            return None
 
     def createRoom(self, roomid, uid, roomname, alivetime):
         createtime = int(time.time())
@@ -43,6 +57,7 @@ class mongoModel:
         room = cur[0]
         room.pop("_id")
         return room
+
 
 
     def updateRoom(self, roomid, **args):

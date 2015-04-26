@@ -42,4 +42,12 @@ class mongoCtrl:
         msg = mongo.pushRoomMsg(roomid, **args)
         return members, msg["time"]
 
+    @staticmethod
+    def receiveToken(uid, sid, token):
+        mongo.writeToken(uid, sid, token)
+
+    @staticmethod
+    def getToken(uid):
+        mongo.readToken(uid)
+
 mctrl = mongoCtrl()
